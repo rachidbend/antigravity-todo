@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STRIDE</title>
+    <!-- CSS is linked -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Early Theme Application -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme') || 'dark';
+            if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        })();
+    </script>
+    <!-- Utils, State, and App JS -->
+    <script src="utils.js" defer></script>
+    <script src="settings.js" defer></script>
+    <script src="state.js" defer></script>
+    <script src="app.js" defer></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- HEADER -->
+        <header class="header-card">
+            <div class="logo">STRIDE</div>
+            <div class="header-actions">
+                <button id="test-suite-btn" class="test-suite-btn" title="Inject Test Suite">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M18.5 2h-13c-.83 0-1.5.67-1.5 1.5v2c0 .54.29 1.01.72 1.28L8 11.2V19c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2v-7.8l3.28-4.42c.43-.27.72-.74.72-1.28v-2c0-.83-.67-1.5-1.5-1.5zm-5.5 10v7h-2v-7l-3-4h8l-3 4z" />
+                    </svg>
+                </button>
+                <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle Theme">
+                    <svg id="icon-moon" style="display: none;" viewBox="0 0 24 24">
+                        <path
+                            d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z" />
+                    </svg>
+                    <svg id="icon-sun" viewBox="0 0 24 24">
+                        <path
+                            d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z" />
+                </button>
+                <button id="archive-toggle-btn" class="archive-toggle-btn" title="View Archive">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 21H4V10h16v11zM19 8H5V5h14v3zM16 14h-8v2h8v-2z" />
+                    </svg>
+                </button>
+                <button id="settings-btn" class="settings-btn" title="Open Settings">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <!-- TIMELINE LIST -->
+            <section class="list-card">
+                <ul id="todo-list">
+                    <!-- Task Articles injected here -->
+                </ul>
+                <div id="empty-msg" class="empty-msg">
+                    <img src="stride_empty_state_illustration_1769710163539.png" alt="Clear Path Illustration"
+                        class="empty-illustration">
+                    <p>Your path is clear.</p>
+                </div>
+            </section>
+
+            <!-- AUTO-SAVE INDICATOR -->
+            <div id="save-indicator" class="save-indicator">
+                <svg viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                </svg>
+                <span>Saved</span>
+            </div>
+        </main>
+
+        <!-- BOTTOM INPUT BAR -->
+        <section class="bottom-input-bar">
+            <!-- Custom Priority Dropdown -->
+            <div class="custom-dropdown" id="urgency-dropdown" tabindex="0">
+                <div class="dropdown-trigger">
+                    <span>Priority</span>
+                    <div class="urgency-stripe none"></div>
+                </div>
+                <div class="dropdown-options">
+                    <div class="dropdown-option" data-urg="none">
+                        <span>None</span>
+                        <div class="urgency-stripe none"></div>
+                    </div>
+                    <div class="dropdown-option" data-urg="low">
+                        <span>Low</span>
+                        <div class="urgency-stripe low"></div>
+                    </div>
+                    <div class="dropdown-option" data-urg="medium">
+                        <span>Medium</span>
+                        <div class="urgency-stripe medium"></div>
+                    </div>
+                    <div class="dropdown-option" data-urg="high">
+                        <span>High</span>
+                        <div class="urgency-stripe high"></div>
+                    </div>
+                </div>
+            </div>
+            <input type="text" id="todo-input" placeholder="Add a new task...">
+            <button id="add-btn" class="add-btn-round">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+            </button>
+        </section>
+
+    </div><!-- End App Container -->
+
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Personalization</h3>
+                <button id="close-settings" class="close-btn">&times;</button>
+            </div>
+
+            <div class="settings-content">
+                <!-- Typography Section -->
+                <div class="settings-section">
+                    <label>Typography</label>
+                    <div class="setting-item">
+                        <span>Main Task Font</span>
+                        <select id="task-font-select">
+                            <option value="'Figtree', sans-serif" class="font-figtree">Standard Stride</option>
+                            <option value="'Inter', sans-serif" class="font-inter">Modern Professional</option>
+                            <option value="'Playfair Display', serif" class="font-playfair">Artistic Elegant</option>
+                            <option value="'Space Grotesk', sans-serif" class="font-space">Technical Clean</option>
+                            <option value="'Outfit', sans-serif" class="font-outfit">Minimalist Airy</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <span>Sub-task Font</span>
+                        <select id="subtask-font-select">
+                            <option value="'Figtree', sans-serif" class="font-figtree">Standard Stride</option>
+                            <option value="'Inter', sans-serif" class="font-inter">Modern Professional</option>
+                            <option value="'Playfair Display', serif" class="font-playfair">Artistic Elegant</option>
+                            <option value="'Space Grotesk', sans-serif" class="font-space">Technical Clean</option>
+                            <option value="'Outfit', sans-serif" class="font-outfit">Minimalist Airy</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Density Section -->
+                <div class="settings-section">
+                    <label>Breathing Room (Density)</label>
+                    <div class="setting-item-column">
+                        <input type="range" id="density-slider" min="0.6" max="1.4" step="0.1" value="1.0">
+                        <div class="range-labels">
+                            <span>Efficient</span>
+                            <span>Breathable</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Contrast Section -->
+                <div class="settings-section">
+                    <label>Priority Contrast</label>
+                    <div class="setting-item">
+                        <span>Palette Type</span>
+                        <div class="segmented-control" id="contrast-segments">
+                            <button class="segment" data-value="Soft">Soft</button>
+                            <button class="segment active" data-value="Standard">Std</button>
+                            <button class="segment" data-value="High">High</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Advanced Settings Section -->
+                <div class="settings-section">
+                    <label>Advanced Settings</label>
+
+                    <!-- Animation Speed -->
+                    <div class="setting-item-column">
+                        <div class="setting-item">
+                            <span>Animation Speed</span>
+                            <span id="speed-value">1.0x</span>
+                        </div>
+                        <input type="range" id="speed-slider" min="0" max="2" step="0.1" value="1.0">
+                    </div>
+
+                    <!-- Toggle Row 1 -->
+                    <div class="setting-item">
+                        <span>Reduced Motion</span>
+                        <input type="checkbox" id="motion-toggle">
+                    </div>
+
+                    <!-- Toggle Row 2 -->
+                    <div class="setting-item">
+                        <span>Stealth Mode (Blur)</span>
+                        <input type="checkbox" id="stealth-toggle">
+                    </div>
+
+                    <!-- Completion Action -->
+                    <div class="setting-item">
+                        <span>Done Task Action</span>
+                        <select id="completion-action">
+                            <option value="stay">Stay in Place</option>
+                            <option value="sink">Sink to Bottom</option>
+                            <option value="archive">Auto-Archive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Reset Section -->
+                <div class="settings-section">
+                    <button id="reset-defaults-btn" class="reset-btn">Reset to Defaults</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
