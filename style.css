@@ -42,12 +42,12 @@
     /* Spacing Scale (Standardized) */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
-    --spacing-lg: 24px;
+    --spacing-lg: 20px;
     --spacing-xl: 32px;
     --density-multiplier: 1.0;
     --spacing: calc(var(--spacing-lg) * var(--density-multiplier));
 
-    --stripe-width: 6px;
+    --stripe-width: 8px;
 
     /* Typography */
     --font-main: 'Poppins', sans-serif;
@@ -95,25 +95,40 @@
 }
 
 /* Contrast Modes - Refined Palettes */
+/* SOFT: Low saturation, high lightness for an understated look */
 body[data-contrast="soft"] {
-    --urgency-high: #F2B8C2;
-    --urgency-medium: #B8D8F2;
-    --urgency-low: #E5F2DF;
-    --urgency-none: #F0F0F0;
+    --urgency-high: #E6A8B3;
+    /* Muted Rose */
+    --urgency-medium: #A8C9E6;
+    /* Muted Sky */
+    --urgency-low: #B7D9C1;
+    /* Pale Sage */
+    --urgency-none: #D1D1D1;
+    /* Soft Pewter */
 }
 
+/* STANDARD: The balanced "Daily Driver" palette */
 body[data-contrast="standard"] {
-    --urgency-high: #FF8FA3;
-    --urgency-medium: #8FD3FF;
-    --urgency-low: #D0F0C0;
-    --urgency-none: #E0E0E0;
+    --urgency-high: #FF6B81;
+    /* Vibrant Coral */
+    --urgency-medium: #5EBFFF;
+    /* Bright Azure */
+    --urgency-low: #8ED9A2;
+    /* Fresh Mint */
+    --urgency-none: #A0A0A0;
+    /* Stone Gray */
 }
 
+/* HIGH: Maximum clarity and saturation for accessibility */
 body[data-contrast="high"] {
-    --urgency-high: #FF3B5C;
-    --urgency-medium: #3BAFFF;
-    --urgency-low: #A5F280;
-    --urgency-none: #FFFFFF;
+    --urgency-high: #E63946;
+    /* Bold Crimson */
+    --urgency-medium: #0077B6;
+    /* Deep Cerulean */
+    --urgency-low: #2D6A4F;
+    /* Deep Emerald */
+    --urgency-none: #555555;
+    /* Heavy Slate */
 }
 
 /* Light Mode Overrides (Optional backup) */
@@ -282,10 +297,7 @@ body {
     border: none;
     padding: 0;
     position: relative;
-    /* Timeline Line */
-    border-left: 2px solid rgba(255, 255, 255, 0.1);
-    margin-left: calc(var(--spacing) * 0.66);
-    padding-left: var(--spacing);
+
 }
 
 ul {
@@ -309,9 +321,11 @@ ul {
     display: flex;
     flex-direction: column;
     font-family: var(--font-task);
-    overflow: hidden;
+
     /* Ensure footer bar is clipped if needed */
     width: 100%;
+    gap: 8px;
+    animation: fadeInUp var(--transition-slow) ease-out;
     /* Consistent width */
 }
 
@@ -324,6 +338,8 @@ ul {
     bottom: 0;
     width: var(--stripe-width);
     background-color: var(--accent-color, var(--urgency-none));
+    border-bottom-left-radius: var(--radius-md);
+    border-top-left-radius: var(--radius-md);
 }
 
 /* Subtle Hover Focus: Border Expansion */
@@ -335,30 +351,7 @@ ul {
 }
 
 /* Timeline Dot */
-.task-card::before {
-    content: '';
-    position: absolute;
-    left: -1.95rem;
-    /* Center on the timeline line */
-    top: 1.5rem;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background-color: transparent;
-    /* Hollow by default */
-    border: 2px solid var(--accent-color, var(--urgency-none));
-    box-shadow: 0 0 0 2px var(--bg-color);
-    /* Cutout effect */
-    z-index: 2;
-    transition: all var(--transition);
-}
 
-.task-card.completed::before {
-    background-color: var(--accent-color, var(--urgency-none));
-    /* Solid fill */
-    box-shadow: 0 0 10px var(--accent-color, var(--urgency-none));
-    /* Glow effect */
-}
 
 /* Dragging State */
 .task-card.dragging {
@@ -380,8 +373,8 @@ ul {
 }
 
 .urgency-chip {
-    padding: 2px 10px;
-    border-radius: 20px;
+    padding: 4px 12px;
+    border-radius: 50px;
     font-size: var(--font-size-small);
     font-weight: 600;
     background-color: rgba(255, 255, 255, 0.05);
@@ -410,8 +403,8 @@ ul {
 
 .card-actions {
     position: absolute;
-    right: 30px;
-    bottom: 0;
+    right: 32px;
+    bottom: -2px;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -419,12 +412,31 @@ ul {
     visibility: hidden;
     transform: translateX(15px);
     transition: all var(--transition-bounce);
-    background: var(--card-bg);
+    background: var(--border-color);
     padding: 2px 10px;
     border-radius: 20px;
     border: 1px solid var(--border-color);
     box-shadow: none;
     z-index: 10;
+}
+
+.three-dots-trigger {
+    padding: 4px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    gap: 4px;
+}
+
+
+.three-dots-trigger span {
+    display: inline-block;
+    height: 4px;
+    width: 4px;
+    border-radius: 50%;
+    background-color: var(--text-primary);
 }
 
 .task-card.active-actions .card-actions {
@@ -469,7 +481,7 @@ ul {
     font-weight: 600;
     color: var(--text-primary);
     cursor: pointer;
-    line-height: var(--line-height-tight, 1.4);
+    line-height: var(--line-height-tight, 1.2);
     flex: 1;
     overflow-wrap: anywhere;
     word-break: break-word;
@@ -481,7 +493,7 @@ ul {
     align-items: flex-start;
     gap: 0;
     width: 100%;
-    margin-bottom: var(--spacing-sm);
+
 }
 
 .task-input {
@@ -591,11 +603,11 @@ ul {
     color: var(--text-primary);
 }
 
-.subtask-checkbox {
+.task-checkbox {
     width: var(--ui-icon-size);
     height: var(--ui-icon-size);
     border: 2px solid var(--text-secondary);
-    border-radius: 6px;
+    border-radius: 50px;
     /* Box Logic with small radius */
     margin-right: var(--spacing-sm);
     cursor: pointer;
@@ -606,17 +618,52 @@ ul {
     transition: all var(--transition-fast);
 }
 
+
+
 .task-card.completed .subtask-checkbox,
 .subtask-item.completed .subtask-checkbox {
     background-color: var(--accent-color);
     border-color: var(--accent-color);
-    color: #1E1F25;
+    color: var(--text-primary);
 }
 
 /* Specific alignment for main checkbox */
 .main-checkbox {
-    margin-top: 2px;
-    /* Aligned to top per user request */
+    width: var(--ui-icon-size);
+    height: var(--ui-icon-size);
+    border: 2px solid var(--text-secondary);
+    border-radius: 50px;
+    /* Box Logic with small radius */
+    margin-right: var(--spacing-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+}
+
+.subtask-checkbox {
+    width: var(--ui-icon-size-small);
+    height: var(--ui-icon-size-small);
+    border: 2px solid var(--text-secondary);
+    border-radius: 50px;
+
+    /* Box Logic with small radius */
+    margin-right: var(--spacing-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+}
+
+.subtask-checkbox p {
+    display: inline-block;
+    font-size: var(--font-size-small);
+    color: var(--text-primary);
+    transform: translateY(-1px);
 }
 
 /* Visual Muting for Completed Tasks */
@@ -710,58 +757,19 @@ ul {
 }
 
 /* 
- * BOTTOM INPUT BAR 
+ * CUSTOM DROPDOWN COMPONENTS (GLOBAL)
  */
-.bottom-input-bar {
-    position: fixed;
-    bottom: 25px;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    width: 90%;
-    max-width: 550px;
-    background-color: #233D4D;
-    border-radius: 30px;
-    padding: calc(var(--spacing) * 0.33) calc(var(--spacing) * 0.5);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    z-index: 100;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.bottom-input-bar input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: #F5FBE6;
-    /* Light color with good contrast */
-    font-size: 1rem;
-    padding: 8px 12px;
-    outline: none;
-    font-weight: 500;
-    font-family: var(--font-task);
-}
-
-.bottom-input-bar input::placeholder {
-    color: rgba(245, 251, 230, 0.6);
-}
-
-/* CUSTOM DROPDOWN components */
 .custom-dropdown {
     position: relative;
     user-select: none;
     cursor: pointer;
     min-width: 110px;
-    height: 40px;
 }
 
 .dropdown-trigger {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* Push stripe to right */
     gap: 12px;
     padding: 0 12px;
     color: #F5FBE6;
@@ -799,9 +807,7 @@ ul {
     bottom: calc(100% + 15px);
     left: 0;
     background-color: var(--card-bg);
-    /* Use design system variable */
     border: 1px solid var(--accent-brand);
-    /* Highlight border */
     border-radius: var(--radius-lg);
     padding: 8px;
     width: 150px;
@@ -809,20 +815,20 @@ ul {
     display: none;
     flex-direction: column;
     gap: 4px;
-    z-index: 2000;
-    /* Ensure it's above everything */
+    z-index: 3000;
 }
 
 .custom-dropdown.active .dropdown-options {
-    display: flex;
+    display: flex !important;
     animation: dropdownSlideDown 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
 .dropdown-option {
+    display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 10px 12px;
+    padding: 8px 12px;
     border-radius: var(--radius-sm);
     color: var(--text-primary);
     font-size: 0.9rem;
@@ -846,43 +852,187 @@ ul {
     }
 }
 
-.add-btn-round {
-    width: 44px;
-    height: 44px;
+/* 
+ * COMMAND CAPSULE (FLOATING)
+ */
+.command-capsule {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 48px;
+    background-color: #233D4D;
+    border-radius: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    z-index: 2100;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: width 0.3s ease-in-out, height 0.3s ease-in-out, padding 0.3s ease-in-out;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.command-capsule.active {
+    width: 90%;
+    max-width: 550px;
+    height: 60px;
+    cursor: default;
+}
+
+/* Idle State display */
+.capsule-idle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #F5FBE6;
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    transition: opacity 0.2s, transform 0.3s ease-in-out;
+    position: absolute;
+    width: 100%;
+}
+
+.command-capsule.active .capsule-idle {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.9);
+}
+
+.idle-plus-icon {
+    width: 18px;
+    height: 18px;
+    fill: #F5FBE6;
+    display: block;
+    flex-shrink: 0;
+}
+
+/* Active State display */
+.capsule-active {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 0 12px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity 0.2s, transform 0.3s ease-in-out;
+    position: absolute;
+    align-items: center;
+}
+
+.command-capsule.active .capsule-active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+}
+
+.active-toolbar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+}
+
+.command-capsule input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #F5FBE6;
+    font-size: 1.05rem;
+    padding: 8px 4px;
+    outline: none;
+    font-weight: 500;
+    font-family: var(--font-task);
+    min-width: 0;
+}
+
+.command-capsule input::placeholder {
+    color: rgba(245, 251, 230, 0.5);
+}
+
+/* Confirm Button inside Capsule */
+.confirm-btn {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background-color: #215E61;
-    /* Dark Teal background */
     color: #F5FBE6;
-    /* Plus symbol color */
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 1.5rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: all var(--anim-duration) var(--anim-curve);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+    transform: scale(0.5);
+    flex-shrink: 0;
 }
 
-.add-btn-round:hover {
+.command-capsule.has-content .confirm-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.confirm-btn:hover {
     background-color: #FE7F2D;
-    /* Orange on hover */
     transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(254, 127, 45, 0.5);
+    box-shadow: 0 0 15px rgba(254, 127, 45, 0.4);
 }
 
-.add-btn-round svg {
+.confirm-btn svg {
     width: 24px;
     height: 24px;
     fill: currentColor;
-    transition: transform var(--anim-duration-slow) ease;
 }
 
-.add-btn-round:hover svg {
-    transform: rotate(90deg);
-    /* Satisfying rotation */
+/* Priority Selector adjustment for Capsule */
+.command-capsule .custom-dropdown {
+    min-width: 40px;
+    /* Only show dot/stripe in compact if needed */
+    height: 36px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 18px;
+    transition: all 0.2s;
 }
+
+.command-capsule .custom-dropdown:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.command-capsule .dropdown-trigger {
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #F5FBE6 !important;
+    height: 100%;
+    min-width: 80px;
+}
+
+.command-capsule .dropdown-trigger span {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    line-height: normal;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.command-capsule .dropdown-options {
+    bottom: calc(100% + 12px);
+    background-color: #233D4D;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    left: 0;
+}
+
+
+
 
 /* Hidden elements from old design */
 .controls-card,
@@ -994,9 +1144,6 @@ ul {
     }
 }
 
-.task-card {
-    animation: fadeInUp var(--transition-slow) ease-out;
-}
 
 /* SETTINGS MODAL STYLES */
 .modal-overlay {

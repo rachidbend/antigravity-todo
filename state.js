@@ -179,19 +179,31 @@ const State = (() => {
     };
 
     const toggleSubTask = (parentId, subId) => {
-        let parentAutoCompleted = false;
+        let parentAutoChanged = false;
+        let needsFullRefresh = false;
+
         tasks = tasks.map(t => {
             if (t.id === parentId && t.subtasks) {
                 t.subtasks = t.subtasks.map(s => s.id === subId ? { ...s, completed: !s.completed } : s);
-                // Check if all subtasks completed
-                if (t.subtasks.length > 0 && t.subtasks.every(s => s.completed) && !t.completed) {
-                    parentAutoCompleted = true;
+
+                const allDone = t.subtasks.length > 0 && t.subtasks.every(s => s.completed);
+
+                if (t.completed !== allDone) {
+                    t.completed = allDone;
+                    parentAutoChanged = true;
+
+                    // Check if parent should move/sink/archive
+                    const mode = window.userPreferences?.completionAction;
+                    if (mode === 'sink' || mode === 'archive') {
+                        needsFullRefresh = true;
+                        if (mode === 'archive' && t.completed) t.isArchived = true;
+                    }
                 }
             }
             return t;
         });
         persist();
-        return parentAutoCompleted;
+        return { parentAutoChanged, needsFullRefresh };
     };
 
     const deleteSubTask = (parentId, subId) => {
