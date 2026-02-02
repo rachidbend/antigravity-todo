@@ -80,44 +80,57 @@
             </div>
         </main>
 
-        <!-- BOTTOM INPUT BAR -->
-        <section class="bottom-input-bar">
-            <!-- Custom Priority Dropdown -->
-            <div class="custom-dropdown" id="urgency-dropdown" tabindex="0">
-                <div class="dropdown-trigger">
-                    <span>Priority</span>
-                    <div class="urgency-stripe none"></div>
-                </div>
-                <div class="dropdown-options">
-                    <div class="dropdown-option" data-urg="none">
-                        <span>None</span>
-                        <div class="urgency-stripe none"></div>
-                    </div>
-                    <div class="dropdown-option" data-urg="low">
-                        <span>Low</span>
-                        <div class="urgency-stripe low"></div>
-                    </div>
-                    <div class="dropdown-option" data-urg="medium">
-                        <span>Medium</span>
-                        <div class="urgency-stripe medium"></div>
-                    </div>
-                    <div class="dropdown-option" data-urg="high">
-                        <span>High</span>
-                        <div class="urgency-stripe high"></div>
-                    </div>
-                </div>
-            </div>
-            <input type="text" id="todo-input" placeholder="Add a new task...">
-            <button id="add-btn" class="add-btn-round">
-                <svg viewBox="0 0 24 24">
+        <!-- COMMAND CAPSULE (FLOATING) -->
+        <section id="command-capsule" class="command-capsule">
+            <!-- Idle State Content -->
+            <div class="capsule-idle">
+                <svg viewBox="0 0 24 24" class="idle-plus-icon">
                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                 </svg>
-            </button>
+                <span id="capsule-display-text">Add Task</span>
+            </div>
+
+            <!-- Active State Content -->
+            <div class="capsule-active">
+                <div class="active-toolbar">
+                    <!-- Custom Priority Dropdown -->
+                    <div class="custom-dropdown" id="urgency-dropdown" tabindex="0">
+                        <div class="dropdown-trigger">
+                            <div class="urgency-stripe none"></div>
+                            <span>Priority</span>
+                        </div>
+                        <div class="dropdown-options">
+                            <div class="dropdown-option" data-urg="none">
+                                <div class="urgency-stripe none"></div>
+                                <span>None</span>
+                            </div>
+                            <div class="dropdown-option" data-urg="low">
+                                <div class="urgency-stripe low"></div>
+                                <span>Low</span>
+                            </div>
+                            <div class="dropdown-option" data-urg="medium">
+                                <div class="urgency-stripe medium"></div>
+                                <span>Medium</span>
+                            </div>
+                            <div class="dropdown-option" data-urg="high">
+                                <div class="urgency-stripe high"></div>
+                                <span>High</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="text" id="todo-input" placeholder="What needs doing?">
+
+                    <button id="add-btn" class="confirm-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </section>
 
     </div><!-- End App Container -->
-
-    </div>
 
     <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="modal-overlay">

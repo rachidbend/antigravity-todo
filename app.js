@@ -15,6 +15,31 @@ const urgOptions = urgDropdown.querySelectorAll('.dropdown-option');
 const activeUrgencyText = urgTrigger.querySelector('span');
 const activeUrgencyStripe = urgTrigger.querySelector('.urgency-stripe');
 
+// Helper to get priority dropdown HTML
+const getPriorityDropdownHTML = () => `
+    <div class="dropdown-options">
+        <div class="dropdown-option" data-urg="none">
+            <div class="urgency-stripe none"></div>
+            <span>None</span>
+        </div>
+        <div class="dropdown-option" data-urg="low">
+            <div class="urgency-stripe low"></div>
+            <span>Low</span>
+        </div>
+        <div class="dropdown-option" data-urg="medium">
+            <div class="urgency-stripe medium"></div>
+            <span>Medium</span>
+        </div>
+        <div class="dropdown-option" data-urg="high">
+            <div class="urgency-stripe high"></div>
+            <span>High</span>
+        </div>
+    </div>
+`;
+
+const commandCapsule = document.getElementById('command-capsule');
+const capsuleDisplayText = document.getElementById('capsule-display-text');
+
 const addBtn = document.getElementById('add-btn');
 const todoList = document.getElementById('todo-list');
 const emptyMsg = document.getElementById('empty-msg');
@@ -143,9 +168,24 @@ const UI = (() => {
             header.className = 'card-header';
 
             const chip = document.createElement('div');
-            chip.className = 'urgency-chip';
-            chip.textContent = task.urgency === 'none' ? 'Task' : `${task.urgency} priority`;
-            chip.onclick = (e) => showPrioritySelector(task.id, article, e);
+            chip.className = 'urgency-chip-container custom-dropdown';
+            chip.innerHTML = `
+                <div class="urgency-chip">${task.urgency === 'none' ? 'Task' : `${task.urgency} priority`}</div>
+                ${getPriorityDropdownHTML()}
+            `;
+
+            chip.onclick = (e) => showPrioritySelector(task.id, chip, e);
+
+            // Bind local options
+            chip.querySelectorAll('.dropdown-option').forEach(opt => {
+                opt.onclick = (e) => {
+                    e.stopPropagation();
+                    const urg = opt.dataset.urg;
+                    State.updateTask(task.id, { urgency: urg });
+                    chip.classList.remove('active');
+                    UI.renderTasks();
+                };
+            });
 
             const wrapper = document.createElement('div');
             wrapper.className = 'card-actions-wrapper';
@@ -167,7 +207,7 @@ const UI = (() => {
 
             const dots = document.createElement('div');
             dots.className = 'three-dots-trigger';
-            dots.innerHTML = '•••';
+            dots.innerHTML = '<span></span><span></span><span></span>';
             dots.onclick = (e) => {
                 e.stopPropagation();
                 article.classList.toggle('active-actions');
@@ -187,7 +227,7 @@ const UI = (() => {
             titleRow.className = 'title-row';
 
             const checkbox = document.createElement('div');
-            checkbox.className = 'subtask-checkbox main-checkbox';
+            checkbox.className = 'main-checkbox';
             checkbox.style.borderColor = accentColor;
             if (task.completed) {
                 checkbox.style.backgroundColor = accentColor;
@@ -230,8 +270,15 @@ const UI = (() => {
                     } else {
                         const chk = document.createElement('div');
                         chk.className = 'subtask-checkbox';
-                        chk.innerHTML = sub.completed ? '✔' : '';
-                        chk.onclick = () => { if (State.toggleSubTask(task.id, sub.id)) renderTasks(); else UI.updateSurgicalSubTask(task.id, sub.id); };
+                        chk.innerHTML = sub.completed ? '<p>✔</p>' : '';
+                        chk.onclick = () => {
+                            const result = State.toggleSubTask(task.id, sub.id);
+                            if (result.needsFullRefresh) {
+                                renderTasks();
+                            } else {
+                                UI.updateSurgicalSubTask(task.id, sub.id, result.parentAutoChanged);
+                            }
+                        };
 
                         const txt = document.createElement('span');
                         txt.textContent = sub.text;
@@ -299,21 +346,16 @@ const UI = (() => {
         });
     };
 
-    const showPrioritySelector = (id, li, e) => {
+    const showPrioritySelector = (id, container, e) => {
         e.stopPropagation();
-        editingTaskId = id;
-        const rect = li.querySelector('.urgency-chip').getBoundingClientRect();
-
-        urgOptionsList.style.display = 'flex';
-        urgOptionsList.style.position = 'fixed';
-        urgOptionsList.style.bottom = 'auto'; // Reset bottom for task-specific
-        urgOptionsList.style.top = `${rect.bottom + 5}px`;
-        urgOptionsList.style.left = `${rect.left}px`;
-        urgOptionsList.style.animation = 'dropdownSlideDown 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28)';
-        urgDropdown.classList.add('active');
+        // Close other dropdowns first
+        document.querySelectorAll('.custom-dropdown.active').forEach(d => {
+            if (d !== container) d.classList.remove('active');
+        });
+        container.classList.toggle('active');
     };
 
-    const updateSurgicalSubTask = (parentId, subId) => {
+    const updateSurgicalSubTask = (parentId, subId, parentChanged) => {
         const task = State.getTasks().find(t => t.id === parentId);
         const sub = task.subtasks.find(s => s.id === subId);
         const taskEl = document.querySelector(`article[data-id="${parentId}"]`);
@@ -321,8 +363,26 @@ const UI = (() => {
 
         if (subItem && sub) {
             subItem.classList.toggle('completed', sub.completed);
-            subItem.querySelector('.subtask-checkbox').innerHTML = sub.completed ? '✔' : '';
+            subItem.querySelector('.subtask-checkbox').innerHTML = sub.completed ? '<p>✔</p>' : '';
         }
+
+        if (parentChanged && taskEl) {
+            taskEl.classList.toggle('completed', task.completed);
+            const mainCheckbox = taskEl.querySelector('.main-checkbox');
+            if (mainCheckbox) {
+                const accentColor = taskEl.style.getPropertyValue('--accent-color');
+                if (task.completed) {
+                    mainCheckbox.style.backgroundColor = accentColor;
+                    mainCheckbox.style.color = '#1E1F25';
+                    mainCheckbox.innerHTML = '✔';
+                } else {
+                    mainCheckbox.style.backgroundColor = 'transparent';
+                    mainCheckbox.style.color = 'inherit';
+                    mainCheckbox.innerHTML = '';
+                }
+            }
+        }
+
         updateProgressBarSurgically(parentId);
     };
 
@@ -439,19 +499,57 @@ const handleDrop = function (e) {
 // ==========================================================================
 // 5. Event Listeners & Init
 // ==========================================================================
-addBtn.onclick = () => {
+addBtn.onclick = (e) => {
+    e.stopPropagation();
     const text = todoInput.value.trim();
     if (!text) return;
     const urgency = urgDropdown.dataset.urgency || 'none';
     State.addTask({ text, urgency });
 
-    // Reset Bottom Bar Priority
+    // Reset Capsule & Draft
     todoInput.value = '';
+    localStorage.removeItem('strideDraft');
+    commandCapsule.classList.remove('has-content');
+    updateCapsuleIdleState();
+
+    // Close Capsule
+    commandCapsule.classList.remove('active');
+
+    // Reset Priority
     urgDropdown.dataset.urgency = 'none';
-    activeUrgencyText.textContent = 'None';
+    activeUrgencyText.textContent = 'Priority';
     activeUrgencyStripe.className = 'urgency-stripe none';
 
     UI.renderTasks();
+};
+
+// Command Capsule Expansion & Draft Logic
+const updateCapsuleIdleState = () => {
+    const draft = localStorage.getItem('strideDraft');
+    if (draft) {
+        const snippet = draft.length > 20 ? draft.substring(0, 17) + '...' : draft;
+        capsuleDisplayText.textContent = `Draft: ${snippet}`;
+    } else {
+        capsuleDisplayText.textContent = 'Add Task';
+    }
+};
+
+commandCapsule.onclick = (e) => {
+    // If we're already active, don't do anything (let children handle clicks)
+    if (commandCapsule.classList.contains('active')) return;
+
+    commandCapsule.classList.add('active');
+    setTimeout(() => todoInput.focus(), 150);
+};
+
+todoInput.oninput = () => {
+    const val = todoInput.value;
+    localStorage.setItem('strideDraft', val);
+    commandCapsule.classList.toggle('has-content', val.trim().length > 0);
+};
+
+todoInput.onkeypress = (e) => {
+    if (e.key === 'Enter') addBtn.click();
 };
 
 testSuiteBtn.onclick = () => {
@@ -464,12 +562,16 @@ testSuiteBtn.onclick = () => {
 // Priority Dropdown Logic (Global & Local)
 urgTrigger.onclick = (e) => {
     e.stopPropagation();
-    editingTaskId = null; // null means bottom bar
-    urgOptionsList.style.display = 'flex';
+    editingTaskId = null;
+
+    // For the capsule dropdown, we use its natural position (absolute)
+    // rather than the fixed positioning used for task cards.
     urgOptionsList.style.position = 'absolute';
-    urgOptionsList.style.bottom = 'calc(100% + 15px)';
     urgOptionsList.style.top = 'auto';
+    urgOptionsList.style.bottom = 'calc(100% + 12px)';
     urgOptionsList.style.left = '0';
+    urgOptionsList.style.width = '150px';
+
     urgDropdown.classList.toggle('active');
 };
 
@@ -480,25 +582,34 @@ urgOptions.forEach(opt => {
         const label = opt.querySelector('span').textContent;
 
         if (editingTaskId) {
-            // Updating existing task
             State.updateTask(editingTaskId, { urgency: urg });
             editingTaskId = null;
         } else {
-            // Updating bottom bar state
             urgDropdown.dataset.urgency = urg;
             activeUrgencyText.textContent = label;
             activeUrgencyStripe.className = `urgency-stripe ${urg}`;
         }
 
         urgDropdown.classList.remove('active');
-        urgOptionsList.style.display = 'none';
         UI.renderTasks();
     };
 });
 
-window.onclick = () => {
-    urgDropdown.classList.remove('active');
-    urgOptionsList.style.display = 'none';
+window.onclick = (e) => {
+    // Close capsule if clicking outside
+    if (!commandCapsule.contains(e.target)) {
+        if (commandCapsule.classList.contains('active')) {
+            commandCapsule.classList.remove('active');
+            updateCapsuleIdleState();
+        }
+    }
+
+    // Close any active priority dropdowns
+    if (!e.target.closest('.custom-dropdown')) {
+        document.querySelectorAll('.custom-dropdown.active').forEach(d => {
+            d.classList.remove('active');
+        });
+    }
 };
 
 // Settings Modal Interaction
@@ -579,6 +690,14 @@ const syncSettingsUI = () => {
 State.loadTasks();
 UI.renderTasks();
 syncSettingsUI();
+
+// Restore Draft
+const savedDraft = localStorage.getItem('strideDraft');
+if (savedDraft) {
+    todoInput.value = savedDraft;
+    commandCapsule.classList.add('has-content');
+}
+updateCapsuleIdleState();
 
 // Early-load sync
 const currentTheme = localStorage.getItem('theme') || 'dark';
